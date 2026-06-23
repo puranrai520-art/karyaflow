@@ -947,4 +947,5 @@ if __name__ == '__main__':
     print("  Employee Portal: http://localhost:5000/employee/")
     print("  Default login:   admin / admin123")
     print("="*50 + "\n")
-    app.run(debug=False, port=5000, use_reloader=False)
+    app.run(host="0.0.0.0",port=5000)
+    
