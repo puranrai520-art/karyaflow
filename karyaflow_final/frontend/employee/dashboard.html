@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>KaryaFlow HR | My Portal</title>
+<meta name="description" content="Employee portal for KaryaFlow HR — View tasks, apply for leave & track attendance"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=JetBrains+Mono:wght@400&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="/css/styles.css" rel="stylesheet"/>
+</head>
+<body class="text-on-surface min-h-screen">
+
+<!-- SIDEBAR -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+<aside id="sidebar" class="fixed left-0 top-0 h-full w-[232px] bg-primary-container flex flex-col py-md px-sm z-50">
+  <div class="mb-xl px-md">
+    <h1 class="font-headline-md text-headline-md font-semibold text-on-primary" style="font-family:Syne">KaryaFlow HR</h1>
+    <p class="font-label-md text-label-md text-on-primary-container opacity-70">Employee Portal</p>
+  </div>
+  <nav class="flex-1 space-y-xs">
+    <a class="flex items-center gap-md p-md transition-colors duration-200 sidebar-active cursor-pointer" onclick="showSection('overview')">
+      <span class="material-symbols-outlined">dashboard</span><span class="font-label-md text-label-md">Overview</span>
+    </a>
+    <a class="flex items-center gap-md p-md transition-colors duration-200 ease-in-out text-on-primary-container font-medium hover:bg-primary hover:text-on-primary cursor-pointer" onclick="showSection('tasks')">
+      <span class="material-symbols-outlined">task_alt</span><span class="font-label-md text-label-md">My Tasks</span>
+    </a>
+    <a class="flex items-center gap-md p-md transition-colors duration-200 ease-in-out text-on-primary-container font-medium hover:bg-primary hover:text-on-primary cursor-pointer" onclick="showSection('leaves')">
+      <span class="material-symbols-outlined">calendar_today</span><span class="font-label-md text-label-md">My Leaves</span>
+    </a>
+    <a class="flex items-center gap-md p-md transition-colors duration-200 ease-in-out text-on-primary-container font-medium hover:bg-primary hover:text-on-primary cursor-pointer" onclick="showSection('attendance')">
+      <span class="material-symbols-outlined">schedule</span><span class="font-label-md text-label-md">Attendance</span>
+    </a>
+    <a class="flex items-center gap-md p-md transition-colors duration-200 ease-in-out text-on-primary-container font-medium hover:bg-primary hover:text-on-primary cursor-pointer" onclick="showSection('profile')">
+      <span class="material-symbols-outlined">person</span><span class="font-label-md text-label-md">My Profile</span>
+    </a>
+  </nav>
+  <div class="mt-auto pt-md border-t border-on-primary-container/10 px-sm">
+    <div class="flex items-center gap-md px-md py-sm">
+      <div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container font-bold text-xs" id="sidebarAvatar">E</div>
+      <div class="overflow-hidden"><p class="font-label-md text-label-md text-on-primary truncate" id="sidebarName">Employee</p><p class="font-body-sm text-on-primary-container opacity-60 truncate" style="font-family:'JetBrains Mono',monospace;font-size:11px" id="sidebarId">—</p></div>
+    </div>
+    <a class="flex items-center gap-md px-md py-sm rounded transition-colors text-on-primary-container font-medium hover:bg-primary hover:text-on-primary cursor-pointer" onclick="signOut()">
+      <span class="material-symbols-outlined">logout</span><span class="font-label-md">Sign Out</span>
+    </a>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="ml-0 md:ml-[232px] min-h-screen">
+  <header class="sticky top-0 w-full h-[56px] bg-surface-container-lowest flex justify-between items-center px-md md:px-lg border-b border-outline-variant z-10">
+    <div class="flex items-center gap-sm">
+      <button class="md:hidden text-primary" onclick="toggleSidebar()"><span class="material-symbols-outlined">menu</span></button>
+      <span class="font-headline-md text-headline-md font-semibold text-primary" id="pageTitle" style="font-family:Syne">Overview</span>
+    </div>
+    <span class="font-body-sm text-body-sm text-on-surface-variant hidden sm:inline" id="topbarDate"></span>
+  </header>
+
+  <!-- ===== OVERVIEW ===== -->
+  <div id="sec-overview" class="p-lg space-y-lg">
+    <!-- Welcome Banner -->
+    <div class="bg-primary-container rounded-xl p-lg flex items-center justify-between flex-wrap gap-md">
+      <div class="flex items-center gap-md">
+        <div class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container font-bold text-lg" id="bannerAvatar">E</div>
+        <div><h2 class="font-headline-md text-headline-md text-on-primary" style="font-family:Syne" id="bannerName">Hello!</h2><p class="font-body-sm text-on-primary-container" id="bannerMeta">—</p></div>
+      </div>
+      <div class="text-right"><p class="font-body-sm text-on-primary-container opacity-60" id="bannerDate"></p><p class="font-label-md text-label-md text-secondary-container mt-xs" id="bannerLogin">—</p></div>
+    </div>
+    <!-- Stats -->
+    <section class="grid grid-cols-2 sm:grid-cols-4 bg-surface-container-lowest rounded-xl py-lg border border-divider">
+      <div class="flex flex-col items-center justify-center px-lg border-r border-divider">
+        <span class="font-label-md text-on-surface-variant uppercase tracking-wider text-center text-[11px]">Leave Balance</span>
+        <span class="font-display-lg text-primary mt-xs" style="font-family:Syne;font-size:40px;font-weight:700" id="statLeave">—</span>
+        <div class="w-full max-w-[80px] mt-xs"><div class="w-full bg-surface-container-high h-1 rounded-full overflow-hidden"><div id="leaveBar" class="h-full rounded-full" style="width:0%;background:#4CAF82;transition:width .4s"></div></div></div>
+      </div>
+      <div class="flex flex-col items-center justify-center px-lg border-r border-divider">
+        <span class="font-label-md text-on-surface-variant uppercase tracking-wider text-[11px]">Open Tasks</span>
+        <span class="font-display-lg text-primary mt-xs" style="font-family:Syne;font-size:40px;font-weight:700" id="statOpenTasks">—</span>
+      </div>
+      <div class="flex flex-col items-center justify-center px-lg border-r border-divider">
+        <span class="font-label-md text-on-surface-variant uppercase tracking-wider text-[11px]">Overdue</span>
+        <span class="font-display-lg text-error mt-xs" style="font-family:Syne;font-size:40px;font-weight:700" id="statOverdue">—</span>
+      </div>
+      <div class="flex flex-col items-center justify-center px-lg">
+        <span class="font-label-md text-on-surface-variant uppercase tracking-wider text-[11px]">Pending Leave</span>
+        <span class="font-display-lg text-primary mt-xs" style="font-family:Syne;font-size:40px;font-weight:700" id="statPendingLeave">—</span>
+      </div>
+    </section>
+    <!-- Today Attendance -->
+    <div class="bg-surface-container-lowest rounded-xl p-lg border border-divider">
+      <h3 class="font-headline-md text-headline-md text-primary mb-md" style="font-family:Syne;font-size:18px">Today's Attendance</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-md" id="todayAtt">
+        <div class="bg-parchment rounded-lg p-md"><p class="font-label-md text-[11px] text-on-surface-variant uppercase tracking-wider mb-xs">Login Time</p><p class="font-headline-md text-headline-md text-green-700" style="font-family:Syne;font-size:20px">—</p></div>
+        <div class="bg-parchment rounded-lg p-md"><p class="font-label-md text-[11px] text-on-surface-variant uppercase tracking-wider mb-xs">Logout Time</p><p class="font-headline-md text-headline-md text-secondary" style="font-family:Syne;font-size:20px">—</p></div>
+        <div class="bg-parchment rounded-lg p-md"><p class="font-label-md text-[11px] text-on-surface-variant uppercase tracking-wider mb-xs">Hours Today</p><p class="font-headline-md text-headline-md text-primary" style="font-family:Syne;font-size:20px">—</p></div>
+      </div>
+    </div>
+    <!-- Recent Tasks -->
+    <div class="bg-surface-container-lowest rounded-xl border border-divider overflow-hidden">
+      <div class="flex justify-between items-center p-lg border-b border-divider">
+        <h3 class="font-headline-md text-headline-md text-primary" style="font-family:Syne;font-size:18px">Recent Tasks</h3>
+        <button onclick="showSection('tasks')" class="text-primary font-label-md flex items-center gap-xs text-sm">View All <span class="material-symbols-outlined text-sm">arrow_forward</span></button>
+      </div>
+      <table class="w-full border-collapse">
+        <thead><tr class="h-[40px] border-b border-divider bg-surface-container-low"><th class="px-md font-label-md text-on-primary-container uppercase tracking-wider text-[11px] text-left">Task</th><th class="px-md font-label-md text-on-primary-container uppercase tracking-wider text-[11px] text-left">Priority</th><th class="px-md font-label-md text-on-primary-container uppercase tracking-wider text-[11px] text-left">Due</th><th class="px-md font-label-md text-on-primary-container uppercase tracking-wider text-[11px] text-left">Status</th></tr></thead>
+        <tbody class="divide-y divide-[#F0EDE8]" id="recentTasksBody"><tr><td colspan="4" class="text-center py-lg text-on-surface-variant font-body-sm">Loading…</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===== MY TASKS ===== -->
+  <div id="sec-tasks" class="hidden p-xl space-y-md">
+    <div><h2 class="font-headline-md text-headline-md font-semibold text-primary" style="font-family:Syne">My Tasks</h2><p class="font-body-sm text-body-sm text-on-surface-variant mt-xs">Tasks assigned to you — click to expand and update</p></div>
+    <div id="taskList"><p class="text-center text-on-surface-variant font-body-sm py-xl">Loading…</p></div>
+  </div>
+
+  <!-- ===== MY LEAVES ===== -->
+  <div id="sec-leaves" class="hidden p-xl space-y-xl">
+    <div><h2 class="font-headline-md text-headline-md font-semibold text-primary" style="font-family:Syne">My Leaves</h2><p class="font-body-sm text-body-sm text-on-surface-variant mt-xs">Apply for leave and track your history</p></div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-xl items-start">
+      <!-- Apply Form -->
+      <div class="bg-surface-container-lowest rounded-xl p-lg border border-divider">
+        <h3 class="font-headline-md text-headline-md text-primary mb-lg" style="font-family:Syne;font-size:18px">Apply for Leave</h3>
+        <div class="grid grid-cols-2 gap-md mb-md">
+          <div><label class="block font-label-md text-label-md text-on-surface-variant mb-xs">From *</label><input id="l_from" type="date" class="w-full h-[40px] border border-outline-variant rounded-lg px-md font-body-sm outline-none focus:border-primary bg-white"/></div>
+          <div><label class="block font-label-md text-label-md text-on-surface-variant mb-xs">To *</label><input id="l_to" type="date" class="w-full h-[40px] border border-outline-variant rounded-lg px-md font-body-sm outline-none focus:border-primary bg-white"/></div>
+        </div>
+        <div class="mb-md">
+          <label class="block font-label-md text-label-md text-on-surface-variant mb-xs">Leave Type</label>
+          <div class="flex border border-outline-variant rounded-lg overflow-hidden">
+            <button class="flex-1 py-sm font-label-md text-label-md bg-primary-container text-white" onclick="setLeaveType('casual',this)">Casual</button>
+            <button class="flex-1 py-sm font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-low border-l border-outline-variant" onclick="setLeaveType('sick',this)">Sick</button>
+            <button class="flex-1 py-sm font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-low border-l border-outline-variant" onclick="setLeaveType('emergency',this)">Emergency</button>
+          </div>
+        </div>
+        <div class="mb-md"><label class="block font-label-md text-label-md text-on-surface-variant mb-xs">Reason *</label><textarea id="l_reason" rows="3" placeholder="Brief reason for leave…" class="w-full border border-outline-variant rounded-lg px-md py-sm font-body-sm outline-none focus:border-primary bg-white resize-none"></textarea></div>
+        <div id="leavePreview" class="hidden mb-md p-md bg-surface-container-low rounded-lg border border-outline-variant font-body-sm text-body-sm text-on-surface-variant"></div>
+        <button onclick="applyLeave()" class="w-full h-[44px] bg-primary-container text-white rounded-lg font-label-md hover:opacity-90 transition-all">Submit Leave Request</button>
+      </div>
+      <!-- History -->
+      <div class="bg-surface-container-lowest rounded-xl border border-divider overflow-hidden">
+        <div class="p-lg border-b border-divider"><h3 class="font-headline-md text-headline-md text-primary" style="font-family:Syne;font-size:18px">Leave History</h3></div>
+        <div class="overflow-x-auto">
+          <table class="w-full border-collapse">
+            <thead><tr class="h-[40px] border-b border-divider bg-surface-container-low"><th class="px-md font-label-md text-on-primary-container uppercase tracking-wider text-[11px] text-left">Period</th><th class="px-md font-label-md text-on-primary-container uppercase tracking-wider text-[11px] text-left">Days</th><th class="px-md font-label-md text-on-primary-container uppercase tracking-wider text-[11px] text-left">Reason</th><th class="px-md font-label-md text-on-primary-container uppercase tracking-wider text-[11px] text-left">Status</th></tr></thead>
+            <tbody class="divide-y divide-[#F0EDE8]" id="myLeaveBody"><tr><td colspan="4" class="text-center py-lg text-on-surface-variant font-body-sm">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ATTENDANCE ===== -->
+  <div id="sec-attendance" class="hidden p-xl space-y-xl">
+    <div><h2 class="font-headline-md text-headline-md font-semibold text-primary" style="font-family:Syne">My Attendance</h2><p class="font-body-sm text-body-sm text-on-surface-variant mt-xs">Last 30 days of login and logout records</p></div>
+    <div class="bg-surface-container-lowest rounded-xl border border-divider overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full border-collapse">
+          <thead><tr class="h-[48px] border-b border-divider bg-surface-container-low text-left"><th class="px-md font-label-md text-on-primary-container uppercase tracking-wider text-[11px]">Date</th><th class="px-md font-label-md text-on-primary-container uppercase tracking-wider text-[11px]">Login</th><th class="px-md font-label-md text-on-primary-container uppercase tracking-wider text-[11px]">Logout</th><th class="px-md font-label-md text-on-primary-container uppercase tracking-wider text-[11px]">Hours</th></tr></thead>
+          <tbody class="divide-y divide-[#F0EDE8]" id="myAttBody"><tr><td colspan="4" class="text-center py-xl text-on-surface-variant font-body-sm">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== PROFILE ===== -->
+  <div id="sec-profile" class="hidden p-xl space-y-xl">
+    <div><h2 class="font-headline-md text-headline-md font-semibold text-primary" style="font-family:Syne">My Profile</h2><p class="font-body-sm text-body-sm text-on-surface-variant mt-xs">Your employment details</p></div>
+    <div class="bg-primary-container rounded-xl p-lg flex items-center gap-md">
+      <div class="w-16 h-16 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container font-bold text-2xl" id="profileAvatar">E</div>
+      <div><h3 class="font-headline-md text-headline-md text-on-primary" style="font-family:Syne" id="profileName">—</h3><p class="font-body-sm text-secondary-container" style="font-family:'JetBrains Mono',monospace" id="profileId">—</p><p class="font-body-sm text-on-primary-container" id="profileDept">—</p></div>
+    </div>
+    <div class="bg-surface-container-lowest rounded-xl border border-divider overflow-hidden grid grid-cols-2" id="profileGrid"></div>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// DEPLOY: Set this to your Render backend URL (e.g. 'https://workpulse-backend.onrender.com/api')
+// Leave empty string for local development (same-origin)
+const API_BASE = '';
+const API=API_BASE + '/api';
+const token=()=>localStorage.getItem('kf_token');
+const H=()=>({'Authorization':'Bearer '+token(),'Content-Type':'application/json'});
+let leaveType='casual', empProfile=null;
+
+if(!token()||localStorage.getItem('kf_role')!=='employee'){window.location.href='/employee/';}
+
+const user=JSON.parse(localStorage.getItem('kf_user')||'{}');
+document.getElementById('sidebarName').textContent=user.full_name||'Employee';
+document.getElementById('sidebarId').textContent=user.employee_id||'—';
+document.getElementById('sidebarAvatar').textContent=(user.full_name||'E')[0].toUpperCase();
+document.getElementById('topbarDate').textContent=new Date().toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+document.getElementById('bannerDate').textContent=new Date().toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'});
+const today=new Date().toISOString().split('T')[0];
+document.getElementById('l_from').value=today;document.getElementById('l_to').value=today;
+document.getElementById('l_from').min=today;document.getElementById('l_to').min=today;
+['l_from','l_to'].forEach(id=>document.getElementById(id).addEventListener('change',updateLeavePreview));
+loadOverview();
+
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('open');
+}
+function showSection(name){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
+  ['overview','tasks','leaves','attendance','profile'].forEach(s=>document.getElementById('sec-'+s).classList.toggle('hidden',s!==name));
+  document.querySelectorAll('aside nav a').forEach(a=>a.classList.remove('sidebar-active'));
+  const idx={overview:0,tasks:1,leaves:2,attendance:3,profile:4}[name];
+  const navItems=document.querySelectorAll('aside nav a');
+  if(navItems[idx])navItems[idx].classList.add('sidebar-active');
+  const titles={overview:'Overview',tasks:'My Tasks',leaves:'My Leaves',attendance:'My Attendance',profile:'My Profile'};
+  document.getElementById('pageTitle').textContent=titles[name]||name;
+  if(name==='tasks')loadMyTasks();
+  if(name==='leaves')loadMyLeaves();
+  if(name==='attendance')loadMyAttendance();
+  if(name==='profile')loadProfile();
+}
+
+async function signOut(){
+  await fetch(`${API}/auth/logout`,{method:'POST',headers:H()});
+  localStorage.clear();window.location.href='/employee/';
+}
+
+async function loadOverview(){
+  const r=await fetch(`${API}/employee/dashboard`,{headers:H()});
+  if(!r.ok){if(r.status===401){localStorage.clear();window.location.href='/employee/';}return;}
+  const d=await r.json();
+  const e=d.employee; empProfile=e;
+  document.getElementById('bannerName').textContent='Hello, '+e.full_name.split(' ')[0]+'!';
+  document.getElementById('bannerMeta').textContent=e.designation+' · '+e.department+' · '+e.employee_id;
+  document.getElementById('bannerAvatar').textContent=e.full_name[0].toUpperCase();
+  const att=d.today_attendance;
+  document.getElementById('bannerLogin').textContent=att?'Logged in at '+fmtTime(att.login_time):'Active today';
+  document.getElementById('statLeave').textContent=e.leaves_remaining;
+  const pct=e.monthly_leaves>0?Math.round(e.leaves_remaining/e.monthly_leaves*100):0;
+  const bar=document.getElementById('leaveBar');
+  bar.style.width=pct+'%';bar.style.background=pct>60?'#4CAF82':pct>30?'#D69E2E':'#D64040';
+  document.getElementById('statOpenTasks').textContent=d.open_tasks;
+  document.getElementById('statOverdue').textContent=d.overdue_tasks;
+  document.getElementById('statPendingLeave').textContent=d.pending_leaves;
+  // Today attendance
+  document.getElementById('todayAtt').innerHTML=`
+    <div class="bg-parchment rounded-lg p-md"><p class="font-label-md text-[11px] text-on-surface-variant uppercase tracking-wider mb-xs">Login Time</p><p class="font-headline-md text-green-700" style="font-family:Syne;font-size:20px;font-weight:600">${att?fmtTime(att.login_time):'—'}</p></div>
+    <div class="bg-parchment rounded-lg p-md"><p class="font-label-md text-[11px] text-on-surface-variant uppercase tracking-wider mb-xs">Logout Time</p><p class="font-headline-md ${att&&att.logout_time?'text-primary':'text-secondary'}" style="font-family:Syne;font-size:20px;font-weight:600">${att&&att.logout_time?fmtTime(att.logout_time):'Still active'}</p></div>
+    <div class="bg-parchment rounded-lg p-md"><p class="font-label-md text-[11px] text-on-surface-variant uppercase tracking-wider mb-xs">Hours Today</p><p class="font-headline-md text-primary" style="font-family:Syne;font-size:20px;font-weight:600">${att&&att.total_hours?att.total_hours+'h':'—'}</p></div>`;
+  // Recent tasks
+  const tb=document.getElementById('recentTasksBody');
+  if(!d.recent_tasks||!d.recent_tasks.length){tb.innerHTML='<tr><td colspan="4" class="text-center py-lg text-on-surface-variant font-body-sm">No tasks assigned yet</td></tr>';return;}
+  const now=new Date().toISOString().split('T')[0];
+  tb.innerHTML=d.recent_tasks.map(t=>{
+    const overdue=t.due_date&&t.due_date<now&&t.status!=='completed';
+    return `<tr class="table-row-h hover:bg-surface-container-low transition-colors">
+      <td class="py-sm px-md font-body-sm font-medium text-primary">${t.title}</td>
+      <td class="py-sm px-md"><div class="flex items-center gap-xs"><span class="w-2 h-2 rounded-full ${prioDot(t.priority)}"></span><span class="font-body-sm capitalize ${prioColor(t.priority)}">${t.priority}</span></div></td>
+      <td class="py-sm px-md font-body-sm ${overdue?'text-error font-bold':'text-on-surface-variant'}">${t.due_date?fmt(t.due_date):'—'}${overdue?' ⚠':''}</td>
+      <td class="py-sm px-md"><span class="inline-block px-2 py-0.5 rounded-full text-[11px] font-bold border ${statusBadge(t.status)}">${fmtStatus(t.status)}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+async function loadMyTasks(){
+  const r=await fetch(`${API}/employee/tasks`,{headers:H()});
+  const tasks=await r.json();
+  const list=document.getElementById('taskList');
+  if(!tasks.length){list.innerHTML='<div class="text-center py-xl"><p class="font-headline-md text-on-surface-variant" style="font-family:Syne;font-size:20px">No tasks yet</p><p class="font-body-sm text-on-surface-variant mt-sm">Tasks assigned by your manager will appear here.</p></div>';return;}
+  const now=new Date().toISOString().split('T')[0];
+  list.innerHTML=tasks.map(t=>{
+    const overdue=t.due_date&&t.due_date<now&&t.status!=='completed';
+    const borderColor={urgent:'border-l-error',high:'border-l-[#D69E2E]',medium:'border-l-[#6B7A99]',low:'border-l-green-600'}[t.priority]||'border-l-outline';
+    return `<div class="bg-surface-container-lowest rounded-xl border border-divider border-l-4 ${borderColor} overflow-hidden mb-md">
+      <div class="flex items-center justify-between p-lg cursor-pointer" onclick="toggleTask('${t.id}')">
+        <div>
+          <div class="flex items-center gap-sm mb-xs">
+            <span class="font-body-md font-bold text-primary">${t.title}</span>
+            <span class="inline-block px-2 py-0.5 rounded-full text-[11px] font-bold border ${statusBadge(t.status)}">${fmtStatus(t.status)}</span>
+          </div>
+          <div class="flex items-center gap-md">
+            <div class="flex items-center gap-xs"><span class="w-2 h-2 rounded-full ${prioDot(t.priority)}"></span><span class="font-body-sm capitalize ${prioColor(t.priority)}">${t.priority}</span></div>
+            <span class="font-body-sm ${overdue?'text-error font-bold':'text-on-surface-variant'}">${t.due_date?'Due '+fmt(t.due_date):'No deadline'}${overdue?' — Overdue ⚠':''}</span>
+          </div>
+        </div>
+        <span class="material-symbols-outlined text-on-surface-variant" id="arr_${t.id}">expand_more</span>
+      </div>
+      <div class="task-card-body border-t border-divider p-lg" id="tcb_${t.id}">
+        ${t.description?`<p class="font-body-sm text-on-surface-variant mb-lg">${t.description}</p>`:''}
+        <textarea id="upd_${t.id}" rows="3" placeholder="Add a progress update or note…" class="w-full border border-outline-variant rounded-lg px-md py-sm font-body-sm outline-none focus:border-primary bg-white resize-none mb-sm"></textarea>
+        <div class="flex gap-sm items-center flex-wrap">
+          <select id="status_${t.id}" class="h-[36px] border border-outline-variant rounded-lg px-md font-body-sm outline-none focus:border-primary bg-white">
+            <option value="">— Change status —</option>
+            <option value="in_progress">Mark In Progress</option>
+            <option value="on_hold">Mark On Hold</option>
+            <option value="completed">Mark Completed</option>
+          </select>
+          <button onclick="submitUpdate('${t.id}')" class="px-lg py-sm bg-primary-container text-white rounded-lg font-label-md hover:opacity-90">Submit Update</button>
+        </div>
+        <div class="mt-lg border-t border-divider pt-lg" id="timeline_${t.id}"><p class="font-body-sm text-on-surface-variant">Loading updates…</p></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleTask(id){
+  const body=document.getElementById('tcb_'+id);
+  const arr=document.getElementById('arr_'+id);
+  const open=body.classList.toggle('open');
+  arr.textContent=open?'expand_less':'expand_more';
+  if(open)loadTimeline(id);
+}
+
+async function loadTimeline(id){
+  const r=await fetch(`${API}/employee/tasks/${id}/updates`,{headers:H()});
+  const updates=await r.json();
+  const el=document.getElementById('timeline_'+id);
+  if(!updates.length){el.innerHTML='<p class="font-body-sm text-on-surface-variant">No updates yet — add the first one above.</p>';return;}
+  el.innerHTML=updates.map(u=>`<div class="flex gap-md mb-md last:mb-0">
+    <div class="w-2 h-2 rounded-full bg-outline mt-sm shrink-0"></div>
+    <div><p class="font-body-sm text-primary">${u.update_text}${u.status_changed_to?` <span class="inline-block px-2 py-0.5 rounded-full text-[11px] border ${statusBadge(u.status_changed_to)} ml-1">${fmtStatus(u.status_changed_to)}</span>`:''}</p><span class="text-[11px] text-on-surface-variant">${fmtTime(u.created_at)}</span></div>
+  </div>`).join('');
+}
+
+async function submitUpdate(id){
+  const text=document.getElementById('upd_'+id).value.trim();
+  const status=document.getElementById('status_'+id).value;
+  if(!text){toast('Please write an update first','error');return;}
+  const r=await fetch(`${API}/employee/tasks/${id}/update`,{method:'POST',headers:H(),body:JSON.stringify({update_text:text,status_changed_to:status||null})});
+  if(r.ok){toast('Update submitted','success');document.getElementById('upd_'+id).value='';document.getElementById('status_'+id).value='';loadTimeline(id);}
+  else{const d=await r.json();toast(d.error||'Failed','error');}
+}
+
+async function loadMyLeaves(){
+  const r=await fetch(`${API}/employee/leaves`,{headers:H()});
+  const leaves=await r.json();
+  const b=document.getElementById('myLeaveBody');
+  if(!leaves.length){b.innerHTML='<tr><td colspan="4" class="text-center py-lg text-on-surface-variant font-body-sm">No leave requests yet.</td></tr>';return;}
+  b.innerHTML=leaves.map(l=>`<tr class="table-row-h hover:bg-surface-container-low transition-colors">
+    <td class="py-sm px-md font-body-sm text-on-surface-variant whitespace-nowrap">${fmt(l.from_date)} — ${fmt(l.to_date)}</td>
+    <td class="py-sm px-md"><span class="font-code-sm bg-surface-container-high px-sm py-1 rounded border border-outline-variant text-xs" style="font-family:'JetBrains Mono',monospace">${l.total_days}d</span></td>
+    <td class="py-sm px-md font-body-sm text-on-surface-variant max-w-[160px] truncate" title="${l.reason}">${l.reason}</td>
+    <td class="py-sm px-md"><span class="inline-block px-2 py-0.5 rounded-full text-[11px] font-bold border ${statusBadge(l.status)}">${fmtStatus(l.status)}</span></td>
+  </tr>`).join('');
+}
+
+async function loadMyAttendance(){
+  const r=await fetch(`${API}/employee/attendance`,{headers:H()});
+  const logs=await r.json();
+  const b=document.getElementById('myAttBody');
+  if(!logs.length){b.innerHTML='<tr><td colspan="4" class="text-center py-xl text-on-surface-variant font-body-sm">No attendance records yet</td></tr>';return;}
+  b.innerHTML=logs.map(l=>`<tr class="table-row-h hover:bg-surface-container-low transition-colors">
+    <td class="py-sm px-md font-body-sm font-medium text-primary">${fmt(l.date)}</td>
+    <td class="py-sm px-md font-body-sm font-medium text-green-700">${fmtTime(l.login_time)}</td>
+    <td class="py-sm px-md font-body-sm ${l.logout_time?'text-on-surface':'text-secondary font-medium'}">${l.logout_time?fmtTime(l.logout_time):'Still active'}</td>
+    <td class="py-sm px-md font-body-sm font-bold text-primary">${l.total_hours?l.total_hours+'h':'—'}</td>
+  </tr>`).join('');
+}
+
+async function loadProfile(){
+  const r=await fetch(`${API}/employee/profile`,{headers:H()});
+  const e=await r.json();
+  document.getElementById('profileName').textContent=e.full_name;
+  document.getElementById('profileId').textContent=e.employee_id;
+  document.getElementById('profileDept').textContent=e.designation+' · '+e.department;
+  document.getElementById('profileAvatar').textContent=e.full_name[0].toUpperCase();
+  const fields=[['Full Name',e.full_name],['Employee ID',e.employee_id],['Email',e.email],['Department',e.department],['Designation',e.designation],['Phone',e.phone||'Not set'],['Joining Date',fmt(e.join_date)],['Monthly Leaves',e.monthly_leaves+' days'],['Leaves Remaining',e.leaves_remaining+' days'],['Status',e.is_active?'Active':'Inactive']];
+  document.getElementById('profileGrid').innerHTML=fields.map(([l,v])=>`<div class="p-md border-b border-r border-divider"><p class="font-label-md text-[11px] text-on-surface-variant uppercase tracking-wider mb-xs">${l}</p><p class="font-body-sm font-medium text-primary">${v}</p></div>`).join('');
+}
+
+function setLeaveType(type,el){
+  leaveType=type;
+  document.querySelectorAll('#sec-leaves .flex.border button').forEach(b=>{b.className='flex-1 py-sm font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-low border-l border-outline-variant first:border-l-0';});
+  el.className='flex-1 py-sm font-label-md text-label-md bg-primary-container text-white';
+}
+
+function updateLeavePreview(){
+  const from=document.getElementById('l_from').value;
+  const to=document.getElementById('l_to').value;
+  const prev=document.getElementById('leavePreview');
+  if(!from||!to||from>to){prev.classList.add('hidden');return;}
+  const days=Math.round((new Date(to)-new Date(from))/(1000*60*60*24))+1;
+  const bal=empProfile?empProfile.leaves_remaining:'?';
+  const after=empProfile?bal-days:'?';
+  prev.innerHTML=`This request is for <strong>${days} day(s)</strong>. You have <strong>${bal} days</strong> remaining. After approval: <strong>${after} days</strong>.`;
+  prev.classList.remove('hidden');
+}
+
+async function applyLeave(){
+  const from=document.getElementById('l_from').value;
+  const to=document.getElementById('l_to').value;
+  const reason=document.getElementById('l_reason').value.trim();
+  if(!from||!to||!reason){toast('Please fill all required fields','error');return;}
+  if(from>to){toast('From date must be before To date','error');return;}
+  const r=await fetch(`${API}/employee/leaves`,{method:'POST',headers:H(),body:JSON.stringify({from_date:from,to_date:to,reason,leave_type:leaveType})});
+  const d=await r.json();
+  if(r.ok){toast(`Leave request submitted for ${d.total_days} day(s)!`,'success');document.getElementById('l_reason').value='';loadMyLeaves();loadOverview();}
+  else toast(d.error||'Failed','error');
+}
+
+function fmt(d){if(!d)return'—';return new Date(d+'T00:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});}
+function fmtTime(dt){if(!dt)return'—';return new Date(dt).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true});}
+function fmtStatus(s){return{pending:'Pending',approved:'Approved',rejected:'Rejected',in_progress:'In Progress',on_hold:'On Hold',completed:'Completed'}[s]||s;}
+function statusBadge(s){return{pending:'bg-[#FDF6E3] text-[#92650A] border-[#F0D080]',approved:'bg-[#EAF6F0] text-[#1A6640] border-[#A8DFC0]',rejected:'bg-[#FBEAEA] text-[#8B1A1A] border-[#F0A8A8]',in_progress:'bg-[#EAF0FB] text-[#1A3A80] border-[#A8C0F0]',on_hold:'bg-[#F4F0FB] text-[#4A2A80] border-[#C8A8F0]',completed:'bg-[#EAF6F0] text-[#1A6640] border-[#A8DFC0]'}[s]||'bg-surface-container text-on-surface-variant border-outline-variant';}
+function prioDot(p){return{urgent:'bg-error',high:'bg-[#D69E2E]',medium:'bg-[#6B7A99]',low:'bg-green-600'}[p]||'bg-outline';}
+function prioColor(p){return{urgent:'text-error',high:'text-[#8B4A0A]',medium:'text-[#1A3A6A]',low:'text-green-700'}[p]||'text-on-surface-variant';}
+function toast(msg,type=''){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show '+(type==='success'?'success':type==='error'?'error':'');setTimeout(()=>t.classList.remove('show'),3200);}
+</script>
+</body></html>

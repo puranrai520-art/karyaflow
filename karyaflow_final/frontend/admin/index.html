@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>KaryaFlow HR | Admin Login</title>
+<meta name="description" content="Admin login for KaryaFlow HR — Enterprise Human Resource Management"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=JetBrains+Mono:wght@400&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="/css/styles.css" rel="stylesheet"/>
+</head>
+<body class="overflow-auto md:overflow-hidden">
+<div class="flex min-h-screen w-full">
+<!-- Left Panel: hidden on mobile -->
+<div class="hidden md:flex w-1/2 bg-primary-container p-xxl flex-col justify-between relative overflow-hidden">
+<div class="absolute inset-0 opacity-10 pointer-events-none"><div class="w-full h-full bg-cover bg-center" style="background-image:url('https://lh3.googleusercontent.com/aida-public/AB6AXuAWTq3xk2uHyDqCJIjCjxbPww8uLzsfRFSRmcaWOiu7MtUwdgIMGbRT7LwDFk2TZ4OUxzOjtlcTwAwK6e4CymDQCLK-2wi7WBGNHvC5jHw8-yL5VY5CXd5NEyzIe76dz70T49KgOKKCn9t84aHChuY_jtMVigpojUfjDAKxDGQizxG--Gk4FGd5DgNjYeCIw7YJlr6W1HiZ9jM6aCxp8xeplP3al7FG-osF-Ez6qj0jFAf_3iBcGgMG6oqGnp-FNrt9MdRg2AQEHi0')"></div></div>
+<div class="relative z-10"><div class="flex items-center space-x-2"><span class="font-headline-md text-headline-md text-white" style="font-family:Syne">KaryaFlow</span><span class="font-headline-md text-headline-md text-secondary-container" style="font-family:Syne">HR</span></div><p class="font-label-md text-label-md text-on-primary-container mt-sm tracking-wide">People, managed right.</p></div>
+<div class="relative z-10 max-w-md"><h1 class="font-display-lg text-display-lg text-white leading-[1.1] mb-md whitespace-pre-line" style="font-family:Syne;font-size:48px;font-weight:700">Your team.
+One place.</h1><div class="w-16 h-1 bg-secondary-container mt-lg"></div></div>
+<div class="relative z-10 grid grid-cols-3 gap-lg border-t border-on-primary-fixed-variant pt-xl"><div><p class="font-headline-md text-headline-md text-white" style="font-family:Syne">500+</p><p class="font-label-md text-label-md text-on-primary-container uppercase tracking-widest mt-xs">Enterprises</p></div><div><p class="font-headline-md text-headline-md text-white" style="font-family:Syne">99.9%</p><p class="font-label-md text-label-md text-on-primary-container uppercase tracking-widest mt-xs">Uptime</p></div><div><p class="font-headline-md text-headline-md text-white" style="font-family:Syne">24/7</p><p class="font-label-md text-label-md text-on-primary-container uppercase tracking-widest mt-xs">Support</p></div></div>
+</div>
+<!-- Right Panel: Login Form -->
+<div class="w-full md:w-1/2 bg-parchment flex items-center justify-center p-lg md:p-xxl min-h-screen md:min-h-0">
+<div class="w-full max-w-[360px]">
+<div class="mb-xl"><h2 class="font-headline-lg text-headline-lg text-primary" style="font-family:Syne">Admin Sign In</h2><p class="font-body-md text-body-md text-on-surface-variant mt-sm">Welcome back to KaryaFlow HR</p></div>
+<div id="errBox" class="hidden mb-md px-md py-sm bg-error-container text-on-error-container rounded-lg font-body-sm text-body-sm border border-red-200"></div>
+<form class="space-y-lg" onsubmit="event.preventDefault();doLogin()">
+<div><label class="block font-label-md text-label-md text-on-surface mb-sm" for="username">Username</label><div class="relative"><span class="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-outline">person</span><input class="w-full h-[40px] pl-[44px] bg-white border border-outline-variant rounded-lg focus:border-primary focus:ring-0 transition-all font-body-md text-body-md text-primary outline-none" id="username" placeholder="admin" type="text" autocomplete="username"/></div></div>
+<div><div class="flex justify-between items-center mb-sm"><label class="block font-label-md text-label-md text-on-surface" for="password">Password</label></div><div class="relative"><span class="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-outline">lock</span><input class="w-full h-[40px] pl-[44px] bg-white border border-outline-variant rounded-lg focus:border-primary focus:ring-0 transition-all font-body-md text-body-md text-primary outline-none" id="password" placeholder="••••••••" type="password" autocomplete="current-password"/></div></div>
+<button class="w-full h-[48px] bg-primary-container text-white font-label-md text-label-md rounded-lg hover:opacity-90 transition-all flex items-center justify-center space-x-sm active:scale-[0.98]" id="loginBtn" type="submit"><span id="btnText">Sign In</span><span class="material-symbols-outlined text-[20px]">arrow_forward</span></button>
+</form>
+<div class="mt-xl pt-xl border-t border-outline-variant"><p class="font-body-sm text-body-sm text-on-surface-variant mb-sm">Default credentials:</p><div class="bg-white border border-outline-variant rounded-lg p-md space-y-xs"><div class="flex justify-between"><span class="font-label-md text-label-md text-on-surface-variant">Username</span><span style="font-family:'JetBrains Mono',monospace;font-size:13px" class="text-primary">admin</span></div><div class="flex justify-between"><span class="font-label-md text-label-md text-on-surface-variant">Password</span><span style="font-family:'JetBrains Mono',monospace;font-size:13px" class="text-primary">admin123</span></div></div></div>
+<p class="mt-lg text-center font-body-sm text-body-sm text-on-surface-variant">Employee? <a class="text-secondary font-bold hover:underline" href="/employee/">Go to Employee Portal →</a></p>
+</div>
+</div>
+</div>
+<script>
+// DEPLOY: Set this to your Render backend URL (e.g. 'https://workpulse-backend.onrender.com/api')
+// Leave empty string for local development (same-origin)
+const API_BASE = '';
+const API=API_BASE + '/api';
+document.getElementById('password').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
+async function doLogin(){
+  const u=document.getElementById('username').value.trim(),p=document.getElementById('password').value.trim();
+  const btn=document.getElementById('loginBtn'),err=document.getElementById('errBox');
+  if(!u||!p){showErr('Please enter username and password.');return}
+  btn.disabled=true;document.getElementById('btnText').textContent='Signing in…';err.classList.add('hidden');
+  try{
+    const r=await fetch(`${API}/auth/login`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})});
+    const d=await r.json();
+    if(!r.ok){showErr(d.error||'Login failed. Check your credentials.');return}
+    if(d.role!=='admin'){showErr('This portal is for admins only. Use the Employee Portal.');return}
+    localStorage.setItem('kf_token',d.token);localStorage.setItem('kf_role',d.role);localStorage.setItem('kf_user',JSON.stringify(d));
+    window.location.href='/admin/dashboard.html';
+  }catch(e){showErr('Cannot connect. Make sure the server is running on port 5000.');}
+  finally{btn.disabled=false;document.getElementById('btnText').textContent='Sign In';}
+}
+function showErr(m){const e=document.getElementById('errBox');e.textContent=m;e.classList.remove('hidden')}
+if(localStorage.getItem('kf_token')&&localStorage.getItem('kf_role')==='admin')window.location.href='/admin/dashboard.html';
+</script>
+</body></html>

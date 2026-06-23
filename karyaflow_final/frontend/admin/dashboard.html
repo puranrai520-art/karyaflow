@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>KaryaFlow HR | Admin Dashboard</title>
+<meta name="description" content="Admin dashboard for KaryaFlow HR — Manage employees, leaves, tasks & attendance"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=JetBrains+Mono:wght@400&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="/css/styles.css" rel="stylesheet"/>
+</head>
+<body class="text-on-surface min-h-screen">
+
+<!-- SIDEBAR -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+<aside id="sidebar" class="fixed left-0 top-0 h-full w-[232px] bg-primary-container flex flex-col py-md px-sm z-50">
+  <div class="mb-xl px-md">
+    <h1 class="font-headline-md text-headline-md font-semibold text-on-primary" style="font-family:Syne">KaryaFlow HR</h1>
+    <p class="font-label-md text-label-md text-on-primary-container opacity-70">Enterprise HR</p>
+  </div>
+  <nav class="flex-1 space-y-xs">
+    <a class="flex items-center gap-md p-md transition-colors duration-200 sidebar-active cursor-pointer" onclick="showSection('dashboard')">
+      <span class="material-symbols-outlined">dashboard</span><span class="font-label-md text-label-md">Dashboard</span>
+    </a>
+    <a class="flex items-center gap-md p-md transition-colors duration-200 ease-in-out text-on-primary-container font-medium hover:bg-primary hover:text-on-primary cursor-pointer" onclick="showSection('employees')">
+      <span class="material-symbols-outlined">groups</span><span class="font-label-md text-label-md">Employees</span>
+    </a>
+    <a class="flex items-center gap-md p-md transition-colors duration-200 ease-in-out text-on-primary-container font-medium hover:bg-primary hover:text-on-primary cursor-pointer" onclick="showSection('leaves')">
+      <span class="material-symbols-outlined">calendar_today</span><span class="font-label-md text-label-md">Leave Requests</span>
+    </a>
+    <a class="flex items-center gap-md p-md transition-colors duration-200 ease-in-out text-on-primary-container font-medium hover:bg-primary hover:text-on-primary cursor-pointer" onclick="showSection('tasks')">
+      <span class="material-symbols-outlined">task_alt</span><span class="font-label-md text-label-md">Tasks</span>
+    </a>
+    <a class="flex items-center gap-md p-md transition-colors duration-200 ease-in-out text-on-primary-container font-medium hover:bg-primary hover:text-on-primary cursor-pointer" onclick="showSection('attendance')">
+      <span class="material-symbols-outlined">schedule</span><span class="font-label-md text-label-md">Attendance</span>
+    </a>
+  </nav>
+  <div class="mt-auto space-y-xs pt-md border-t border-on-primary-container/10 px-sm">
+    <div class="flex items-center gap-md px-md py-sm">
+      <div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container font-bold text-xs" id="sidebarAvatar">A</div>
+      <div><p class="font-label-md text-label-md text-on-primary" id="sidebarName">Admin</p><p class="font-body-sm text-body-sm text-on-primary-container opacity-60">Administrator</p></div>
+    </div>
+    <a class="flex items-center gap-md px-md py-sm rounded transition-colors text-on-primary-container font-medium hover:bg-primary hover:text-on-primary cursor-pointer" onclick="signOut()">
+      <span class="material-symbols-outlined">logout</span><span class="font-label-md">Sign Out</span>
+    </a>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="ml-0 md:ml-[232px] min-h-screen">
+  <!-- TOPBAR -->
+  <header class="sticky top-0 w-full h-[56px] bg-surface-container-lowest flex justify-between items-center px-md md:px-lg border-b border-outline-variant z-10">
+    <div class="flex items-center gap-sm">
+      <button class="md:hidden text-primary" onclick="toggleSidebar()"><span class="material-symbols-outlined">menu</span></button>
+      <span class="font-headline-md text-headline-md font-semibold text-primary" id="pageTitle" style="font-family:Syne">Overview</span>
+    </div>
+    <div class="flex items-center gap-md">
+      <span class="font-body-sm text-body-sm text-on-surface-variant" id="topbarDate"></span>
+    </div>
+  </header>
+
+  <!-- ===== DASHBOARD SECTION ===== -->
+  <div id="sec-dashboard" class="p-lg space-y-lg">
+    <!-- Stats Row -->
+    <section class="grid grid-cols-1 sm:grid-cols-3 bg-surface-container-lowest rounded-xl py-lg border border-divider">
+      <div class="flex flex-col items-center justify-center px-lg border-b sm:border-b-0 sm:border-r border-divider pb-md sm:pb-0">
+        <span class="font-label-md text-on-surface-variant uppercase tracking-wider">Active Employees</span>
+        <span class="font-display-lg text-primary mt-xs" style="font-family:Syne;font-size:48px;font-weight:700" id="statEmp">—</span>
+      </div>
+      <div class="flex flex-col items-center justify-center px-lg border-b sm:border-b-0 sm:border-r border-divider py-md sm:py-0">
+        <span class="font-label-md text-on-surface-variant uppercase tracking-wider">Pending Leaves</span>
+        <span class="font-display-lg text-primary mt-xs" style="font-family:Syne;font-size:48px;font-weight:700" id="statLeaves">—</span>
+      </div>
+      <div class="flex flex-col items-center justify-center px-lg">
+        <span class="font-label-md text-on-surface-variant uppercase tracking-wider">Open Tasks</span>
+        <span class="font-display-lg text-primary mt-xs" style="font-family:Syne;font-size:48px;font-weight:700" id="statTasks">—</span>
+      </div>
+    </section>
+    <!-- 65/35 split -->
+    <div class="grid grid-cols-10 gap-lg">
+      <!-- Pending Leaves Table -->
+      <section class="col-span-10 lg:col-span-6 bg-surface-container-lowest rounded-xl p-lg border border-divider">
+        <div class="flex justify-between items-center mb-md">
+          <h2 class="font-headline-md text-headline-md text-primary" style="font-family:Syne">Pending Leave Requests</h2>
+          <button class="text-primary font-label-md flex items-center gap-xs" onclick="showSection('leaves')">View All <span class="material-symbols-outlined text-sm">arrow_forward</span></button>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="table-row-h border-b border-divider">
+                <th class="font-label-md text-on-surface-variant py-sm px-md text-[11px] uppercase tracking-wider">Employee</th>
+                <th class="font-label-md text-on-surface-variant py-sm px-md text-[11px] uppercase tracking-wider">Period</th>
+                <th class="font-label-md text-on-surface-variant py-sm px-md text-center text-[11px] uppercase tracking-wider">Days</th>
+                <th class="font-label-md text-on-surface-variant py-sm px-md text-right text-[11px] uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-[#F0EDE8]" id="dashLeaveBody">
+              <tr><td colspan="4" class="text-center py-xl text-on-surface-variant font-body-sm">Loading…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+      <!-- Task Overview -->
+      <section class="col-span-10 lg:col-span-4 bg-surface-container-lowest rounded-xl p-lg border border-divider">
+        <div class="flex justify-between items-center mb-md">
+          <h2 class="font-headline-md text-headline-md text-primary" style="font-family:Syne">Task Overview</h2>
+          <button class="font-label-md text-primary text-sm" onclick="showSection('tasks')">View All</button>
+        </div>
+        <div class="space-y-md" id="dashTaskBody">
+          <p class="text-center text-on-surface-variant font-body-sm py-xl">Loading…</p>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- ===== EMPLOYEES SECTION ===== -->
+  <div id="sec-employees" class="hidden p-xl space-y-xl">
+    <div class="flex items-center justify-between">
+      <div><h2 class="font-headline-md text-headline-md font-semibold text-primary" style="font-family:Syne">Employees</h2><p class="font-body-sm text-body-sm text-on-surface-variant mt-xs">Manage your team directory</p></div>
+      <button class="bg-primary-container text-white px-md py-sm rounded-lg flex items-center gap-sm font-label-md hover:opacity-90 transition-opacity" onclick="openModal('addEmpModal')">
+        <span class="material-symbols-outlined">person_add</span>Add Employee
+      </button>
+    </div>
+    <div class="bg-surface-container-lowest rounded-xl border border-outline-variant overflow-hidden">
+      <table class="w-full border-collapse">
+        <thead>
+          <tr class="bg-surface-container-low text-left h-[48px] border-b border-outline-variant">
+            <th class="px-md font-label-md text-on-primary-container uppercase tracking-wider text-[11px]">Name &amp; Email</th>
+            <th class="px-md font-label-md text-on-primary-container uppercase tracking-wider text-[11px]">Employee ID</th>
+            <th class="px-md font-label-md text-on-primary-container uppercase tracking-wider text-[11px]">Department</th>
+            <th class="px-md font-label-md text-on-primary-container uppercase tracking-wider text-[11px]">Designation</th>
+            <th class="px-md font-label-md text-on-primary-container uppercase tracking-wider text-[11px]">Leave Balance</th>
+            <th class="px-md font-label-md text-on-primary-container uppercase tracking-wider text-[11px]">Status</th>
+            <th class="px-md font-label-md text-on-primary-container uppercase tracking-wider text-[11px] text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-outline-variant" id="empBody">
+          <tr><td colspan="7" class="text-center py-xl text-on-surface-variant font-body-sm">Loading…</td></tr>
+        </tbody>
+      </table>
+      <div class="px-lg py-md flex items-center justify-between bg-surface-container-lowest border-t border-outline-variant">
+        <span class="font-body-sm text-body-sm text-on-surface-variant" id="empCount">—</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== LEAVES SECTION ===== -->
+  <div id="sec-leaves" class="hidden p-xl space-y-xl">
+    <div><h2 class="font-headline-md text-headline-md font-semibold text-primary" style="font-family:Syne">Leave Requests</h2><p class="font-body-sm text-body-sm text-on-surface-variant mt-xs">Review and approve employee leave applications</p></div>
+    <!-- Filter Tabs -->
+    <div class="flex gap-xs bg-surface-container-lowest border border-outline-variant rounded-lg p-xs w-fit">
+      <button class="px-md py-sm rounded font-label-md text-label-md bg-primary-container text-white" onclick="filterLeaves('',this)" id="tab-all">All</button>
+      <button class="px-md py-sm rounded font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-low" onclick="filterLeaves('pending',this)">Pending</button>
+      <button class="px-md py-sm rounded font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-low" onclick="filterLeaves('approved',this)">Approved</button>
+      <button class="px-md py-sm rounded font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-low" onclick="filterLeaves('rejected',this)">Rejected</button>
+    </div>
+    <div class="bg-surface-container-lowest rounded-xl border border-outline-variant overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full border-collapse">
+          <thead>
+            <tr class="bg-surface-container-low text-left h-[48px] border-b border-outline-variant">
+              <th class="px-md font-label-md text-on-primary-container uppercase tracking-wider text-[11px]">Employee</th>
+              <th class="px-md font-label-md text-on-primary-container uppercase tracking-wider text-[11px]">Period</th>
+              <th class="px-md font-label-md text-on-primary-container uppercase tracking-wider text-[11px]">Days</th>
+              <th class="px-md font-label-md text-on-primary-container uppercase tracking-wider text-[11px]">Type</th>
+              <th class="px-md font-label-md text-on-primary-container uppercase tracking-wider text-[11px]">Reason</th>
+              <th class="px-md font-label-md text-on-primary-container uppercase tracking-wider text-[11px]">Status</th>
+              <th class="px-md font-label-md text-on-primary-container uppercase tracking-wider text-[11px] text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[#F0EDE8]" id="leaveBody">
+            <tr><td colspan="7" class="text-center py-xl text-on-surface-variant font-body-sm">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TASKS SECTION ===== -->
+  <div id="sec-tasks" class="hidden p-xl space-y-xl">
+    <div class="flex items-center justify-between">
+      <div><h2 class="font-headline-md text-headline-md font-semibold text-primary" style="font-family:Syne">Tasks</h2><p class="font-body-sm text-body-sm text-on-surface-variant mt-xs">Assign and track employee tasks</p></div>
+      <button class="bg-primary-container text-white px-md py-sm rounded-lg flex items-center gap-sm font-label-md hover:opacity-90" onclick="openModal('addTaskModal')">
+        <span class="material-symbols-outlined">add_task</span>Assign Task
+      </button>
+    </div>
+    <div class="bg-surface-container-lowest rounded-xl border border-outline-variant overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full border-collapse">
+          <thead>
+            <tr class="bg-surface-container-low text-left h-[48px] border-b border-outline-variant">
+              <th class="px-md font-label-md text-on-primary-container uppercase tracking-wider text-[11px]">Task</th>
+              <th class="px-md font-label-md text-on-primary-container uppercase tracking-wider text-[11px]">Assigned To</th>
+              <th class="px-md font-label-md text-on-primary-container uppercase tracking-wider text-[11px]">Priority</th>
+              <th class="px-md font-label-md text-on-primary-container uppercase tracking-wider text-[11px]">Due Date</th>
+              <th class="px-md font-label-md text-on-primary-container uppercase tracking-wider text-[11px]">Status</th>
+              <th class="px-md font-label-md text-on-primary-container uppercase tracking-wider text-[11px] text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[#F0EDE8]" id="taskBody">
+            <tr><td colspan="6" class="text-center py-xl text-on-surface-variant font-body-sm">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ATTENDANCE SECTION ===== -->
+  <div id="sec-attendance" class="hidden p-xl space-y-xl">
+    <div class="flex items-center justify-between flex-wrap gap-md">
+      <div><h2 class="font-headline-md text-headline-md font-semibold text-primary" style="font-family:Syne">Attendance Log</h2><p class="font-body-sm text-body-sm text-on-surface-variant mt-xs">Employee login and logout times</p></div>
+      <div class="flex items-center gap-sm">
+        <label class="font-label-md text-label-md text-on-surface-variant">Date:</label>
+        <input type="date" id="attDate" class="h-[36px] border border-outline-variant rounded-lg px-md font-body-sm text-body-sm outline-none focus:border-primary bg-white"/>
+        <button class="px-md py-sm border border-outline-variant rounded-lg font-label-md text-label-md text-on-surface-variant hover:border-primary hover:text-primary" onclick="loadAttendance()">Filter</button>
+      </div>
+    </div>
+    <div class="bg-surface-container-lowest rounded-xl border border-outline-variant overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full border-collapse">
+          <thead>
+            <tr class="bg-surface-container-low text-left h-[48px] border-b border-outline-variant">
+              <th class="px-md font-label-md text-on-primary-container uppercase tracking-wider text-[11px]">Employee</th>
+              <th class="px-md font-label-md text-on-primary-container uppercase tracking-wider text-[11px]">ID</th>
+              <th class="px-md font-label-md text-on-primary-container uppercase tracking-wider text-[11px]">Department</th>
+              <th class="px-md font-label-md text-on-primary-container uppercase tracking-wider text-[11px]">Login Time</th>
+              <th class="px-md font-label-md text-on-primary-container uppercase tracking-wider text-[11px]">Logout Time</th>
+              <th class="px-md font-label-md text-on-primary-container uppercase tracking-wider text-[11px]">Hours</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[#F0EDE8]" id="attBody">
+            <tr><td colspan="6" class="text-center py-xl text-on-surface-variant font-body-sm">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="px-lg py-md border-t border-outline-variant"><span class="font-body-sm text-body-sm text-on-surface-variant" id="attCount"></span></div>
+    </div>
+  </div>
+</main>
+
+<!-- ===== ADD EMPLOYEE MODAL ===== -->
+<div class="modal-bg" id="addEmpModal">
+  <div class="modal-box">
+    <div class="flex justify-between items-center mb-lg">
+      <h3 class="font-headline-md text-headline-md text-primary" style="font-family:Syne">Add New Employee</h3>
+      <button onclick="closeModal('addEmpModal')" class="text-on-surface-variant hover:text-primary text-2xl leading-none">&times;</button>
+    </div>
+    <!-- Form -->
+    <div id="addEmpForm">
+      <div class="grid grid-cols-2 gap-md mb-md">
+        <div><label class="block font-label-md text-label-md text-on-surface-variant mb-xs">Full Name *</label><input id="f_name" type="text" placeholder="Priya Sharma" class="w-full h-[40px] border border-outline-variant rounded-lg px-md font-body-sm outline-none focus:border-primary bg-white"/></div>
+        <div><label class="block font-label-md text-label-md text-on-surface-variant mb-xs">Email *</label><input id="f_email" type="email" placeholder="priya@company.com" class="w-full h-[40px] border border-outline-variant rounded-lg px-md font-body-sm outline-none focus:border-primary bg-white"/></div>
+      </div>
+      <div class="grid grid-cols-2 gap-md mb-md">
+        <div><label class="block font-label-md text-label-md text-on-surface-variant mb-xs">Department *</label>
+          <select id="f_dept" class="w-full h-[40px] border border-outline-variant rounded-lg px-md font-body-sm outline-none focus:border-primary bg-white">
+            <option value="">Select…</option><option>Engineering</option><option>Marketing</option><option>Sales</option><option>Finance</option><option>HR</option><option>Operations</option><option>Design</option><option>Legal</option>
+          </select>
+        </div>
+        <div><label class="block font-label-md text-label-md text-on-surface-variant mb-xs">Designation *</label><input id="f_desg" type="text" placeholder="Software Engineer" class="w-full h-[40px] border border-outline-variant rounded-lg px-md font-body-sm outline-none focus:border-primary bg-white"/></div>
+      </div>
+      <div class="grid grid-cols-2 gap-md mb-md">
+        <div><label class="block font-label-md text-label-md text-on-surface-variant mb-xs">Phone</label><input id="f_phone" type="tel" placeholder="+91 98765 43210" class="w-full h-[40px] border border-outline-variant rounded-lg px-md font-body-sm outline-none focus:border-primary bg-white"/></div>
+        <div><label class="block font-label-md text-label-md text-on-surface-variant mb-xs">Joining Date *</label><input id="f_join" type="date" class="w-full h-[40px] border border-outline-variant rounded-lg px-md font-body-sm outline-none focus:border-primary bg-white"/></div>
+      </div>
+      <div class="mb-lg"><label class="block font-label-md text-label-md text-on-surface-variant mb-xs">Monthly Leave Quota</label><input id="f_leaves" type="number" value="10" min="0" max="30" class="w-full h-[40px] border border-outline-variant rounded-lg px-md font-body-sm outline-none focus:border-primary bg-white"/></div>
+      <div class="flex gap-md justify-end border-t border-divider pt-lg">
+        <button onclick="closeModal('addEmpModal')" class="px-lg py-sm border border-outline-variant rounded-lg font-label-md text-on-surface-variant hover:border-primary">Cancel</button>
+        <button onclick="createEmployee()" class="px-lg py-sm bg-primary-container text-white rounded-lg font-label-md hover:opacity-90">Generate ID &amp; Create</button>
+      </div>
+    </div>
+    <!-- Success -->
+    <div id="addEmpSuccess" class="hidden">
+      <p class="font-body-sm text-body-sm text-on-surface-variant mb-md">Employee created. Credentials emailed and shown below. <strong>Save the password — shown only once.</strong></p>
+      <div class="bg-primary-container rounded-xl p-lg space-y-sm">
+        <div class="flex justify-between items-center"><span class="font-label-md text-label-md text-on-primary-container opacity-60 uppercase tracking-wider text-[10px]">Employee ID</span><div class="flex items-center gap-sm"><span class="font-code-sm text-secondary-container" style="font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700" id="newEmpId">—</span><button onclick="copyIt('newEmpId')" class="text-[10px] bg-white/10 text-white px-sm py-xs rounded hover:bg-white/20">Copy</button></div></div>
+        <div class="flex justify-between items-center"><span class="font-label-md text-label-md text-on-primary-container opacity-60 uppercase tracking-wider text-[10px]">Password</span><div class="flex items-center gap-sm"><span class="font-code-sm text-secondary-container" style="font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700" id="newEmpPass">—</span><button onclick="copyIt('newEmpPass')" class="text-[10px] bg-white/10 text-white px-sm py-xs rounded hover:bg-white/20">Copy</button></div></div>
+        <div class="flex justify-between items-center"><span class="font-label-md text-label-md text-on-primary-container opacity-60 uppercase tracking-wider text-[10px]">Name</span><span class="font-body-sm text-white" id="newEmpName">—</span></div>
+        <div class="flex justify-between items-center"><span class="font-label-md text-label-md text-on-primary-container opacity-60 uppercase tracking-wider text-[10px]">Email Sent</span><span class="font-body-sm text-on-primary-container" id="newEmpEmailStatus">—</span></div>
+        <p class="font-body-sm text-on-primary-container opacity-50 text-xs pt-sm border-t border-white/10">This password will not be shown again. Share it securely.</p>
+      </div>
+      <button onclick="doneAddEmp()" class="w-full mt-lg py-sm bg-primary-container text-white rounded-lg font-label-md hover:opacity-90">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ADD TASK MODAL ===== -->
+<div class="modal-bg" id="addTaskModal">
+  <div class="modal-box">
+    <div class="flex justify-between items-center mb-lg">
+      <h3 class="font-headline-md text-headline-md text-primary" style="font-family:Syne">Assign New Task</h3>
+      <button onclick="closeModal('addTaskModal')" class="text-on-surface-variant hover:text-primary text-2xl leading-none">&times;</button>
+    </div>
+    <div class="mb-md"><label class="block font-label-md text-label-md text-on-surface-variant mb-xs">Task Title *</label><input id="t_title" type="text" placeholder="Review Q3 sales report" class="w-full h-[40px] border border-outline-variant rounded-lg px-md font-body-sm outline-none focus:border-primary bg-white"/></div>
+    <div class="mb-md"><label class="block font-label-md text-label-md text-on-surface-variant mb-xs">Description</label><textarea id="t_desc" rows="3" placeholder="Provide details…" class="w-full border border-outline-variant rounded-lg px-md py-sm font-body-sm outline-none focus:border-primary bg-white resize-none"></textarea></div>
+    <div class="grid grid-cols-2 gap-md mb-md">
+      <div><label class="block font-label-md text-label-md text-on-surface-variant mb-xs">Assign To *</label>
+        <select id="t_emp" class="w-full h-[40px] border border-outline-variant rounded-lg px-md font-body-sm outline-none focus:border-primary bg-white"><option value="">Select employee…</option></select>
+      </div>
+      <div><label class="block font-label-md text-label-md text-on-surface-variant mb-xs">Priority</label>
+        <select id="t_priority" class="w-full h-[40px] border border-outline-variant rounded-lg px-md font-body-sm outline-none focus:border-primary bg-white">
+          <option value="low">Low</option><option value="medium" selected>Medium</option><option value="high">High</option><option value="urgent">Urgent</option>
+        </select>
+      </div>
+    </div>
+    <div class="mb-lg"><label class="block font-label-md text-label-md text-on-surface-variant mb-xs">Due Date</label><input id="t_due" type="date" class="w-full h-[40px] border border-outline-variant rounded-lg px-md font-body-sm outline-none focus:border-primary bg-white"/></div>
+    <div class="flex gap-md justify-end border-t border-divider pt-lg">
+      <button onclick="closeModal('addTaskModal')" class="px-lg py-sm border border-outline-variant rounded-lg font-label-md text-on-surface-variant hover:border-primary">Cancel</button>
+      <button onclick="createTask()" class="px-lg py-sm bg-primary-container text-white rounded-lg font-label-md hover:opacity-90">Assign Task</button>
+    </div>
+  </div>
+</div>
+
+<!-- TASK UPDATES MODAL -->
+<div class="modal-bg" id="taskUpdatesModal">
+  <div class="modal-box" style="max-width:520px">
+    <div class="flex justify-between items-center mb-lg">
+      <h3 class="font-headline-md text-headline-md text-primary" style="font-family:Syne" id="tuModalTitle">Task Updates</h3>
+      <button onclick="closeModal('taskUpdatesModal')" class="text-on-surface-variant hover:text-primary text-2xl leading-none">&times;</button>
+    </div>
+    <div id="tuModalBody"><p class="text-center text-on-surface-variant font-body-sm py-lg">Loading…</p></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// DEPLOY: Set this to your Render backend URL (e.g. 'https://workpulse-backend.onrender.com/api')
+// Leave empty string for local development (same-origin)
+const API_BASE = '';
+const API=API_BASE + '/api';
+const token=()=>localStorage.getItem('kf_token');
+const H=()=>({'Authorization':'Bearer '+token(),'Content-Type':'application/json'});
+let allEmps=[];
+
+// Auth guard
+if(!token()||localStorage.getItem('kf_role')!=='admin'){window.location.href='/admin/';}
+
+// Init
+const user=JSON.parse(localStorage.getItem('kf_user')||'{}');
+document.getElementById('sidebarName').textContent=user.full_name||'Admin';
+document.getElementById('sidebarAvatar').textContent=(user.full_name||'A')[0].toUpperCase();
+document.getElementById('topbarDate').textContent=new Date().toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+const today=new Date().toISOString().split('T')[0];
+document.getElementById('attDate').value=today;
+document.getElementById('f_join').value=today;
+loadDashboard();
+// Pre-load employees so task dropdown is always ready
+loadAllEmployeesForDropdown();
+
+// ── SECTION SWITCHING ──────────────────────────────────────
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('open');
+}
+function showSection(name){
+  // Close mobile sidebar
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
+  ['dashboard','employees','leaves','tasks','attendance'].forEach(s=>{
+    document.getElementById('sec-'+s).classList.toggle('hidden',s!==name);
+  });
+  document.querySelectorAll('aside nav a').forEach(a=>a.classList.remove('sidebar-active'));
+  const idx={dashboard:0,employees:1,leaves:2,tasks:3,attendance:4}[name];
+  const navItems=document.querySelectorAll('aside nav a');
+  if(navItems[idx]){navItems[idx].classList.add('sidebar-active');}
+  const titles={dashboard:'Overview',employees:'Employees',leaves:'Leave Requests',tasks:'Tasks',attendance:'Attendance Log'};
+  document.getElementById('pageTitle').textContent=titles[name]||name;
+  if(name==='employees')loadEmployees();
+  if(name==='leaves')loadLeaves('');
+  if(name==='tasks')loadTasks();
+  if(name==='attendance')loadAttendance();
+}
+
+// ── MODAL ─────────────────────────────────────────────────
+function openModal(id){
+  // Always refresh employee dropdown before opening task modal
+  if(id==='addTaskModal') loadAllEmployeesForDropdown();
+  document.getElementById(id).classList.add('open');
+}
+function closeModal(id){document.getElementById(id).classList.remove('open')}
+
+// ── SIGN OUT ──────────────────────────────────────────────
+async function signOut(){
+  await fetch(`${API}/auth/logout`,{method:'POST',headers:H()});
+  localStorage.clear();window.location.href='/admin/';
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────
+async function loadDashboard(){
+  const r=await fetch(`${API}/admin/dashboard`,{headers:H()});
+  if(!r.ok){if(r.status===401){localStorage.clear();window.location.href='/admin/';}return}
+  const d=await r.json();
+  document.getElementById('statEmp').textContent=d.total_employees;
+  document.getElementById('statLeaves').textContent=d.pending_leaves;
+  document.getElementById('statTasks').textContent=d.open_tasks;
+  // Pending leaves table
+  const lb=document.getElementById('dashLeaveBody');
+  if(!d.pending_leaves_list||!d.pending_leaves_list.length){lb.innerHTML='<tr><td colspan="4" class="text-center py-xl text-on-surface-variant font-body-sm text-body-sm">No pending leave requests</td></tr>';return;}
+  lb.innerHTML=d.pending_leaves_list.map(l=>`
+    <tr class="table-row-h hover:bg-surface-container-low transition-colors">
+      <td class="py-sm px-md"><div class="flex items-center gap-sm"><div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-on-primary font-bold text-xs">${l.full_name[0]}</div><span class="font-body-md text-primary font-medium">${l.full_name}</span></div></td>
+      <td class="font-body-sm text-on-surface-variant py-sm px-md">${fmt(l.from_date)} — ${fmt(l.to_date)}</td>
+      <td class="font-body-sm text-on-surface-variant py-sm px-md text-center">${l.total_days}</td>
+      <td class="py-sm px-md text-right space-x-2">
+        <button onclick="approveLeave('${l.id}')" class="px-sm py-1 border border-divider text-ink-navy rounded font-label-md text-xs hover:bg-ink-navy hover:text-white transition-colors">Approve</button>
+        <button onclick="rejectLeave('${l.id}')" class="px-sm py-1 border border-[#F0A8A8] text-[#991B1B] rounded font-label-md text-xs hover:bg-[#991B1B] hover:text-white transition-colors">Reject</button>
+      </td>
+    </tr>`).join('');
+  // Tasks overview
+  const tb=document.getElementById('dashTaskBody');
+  if(!d.recent_tasks||!d.recent_tasks.length){tb.innerHTML='<p class="text-center text-on-surface-variant font-body-sm py-xl">No tasks yet</p>';return;}
+  tb.innerHTML=d.recent_tasks.slice(0,3).map(t=>`
+    <div class="p-md bg-background rounded-lg border border-divider hover:border-primary transition-colors cursor-pointer">
+      <div class="flex justify-between items-start mb-xs">
+        <div class="flex items-center gap-xs"><span class="w-2 h-2 rounded-full ${prioDot(t.priority)}"></span><span class="font-label-md text-xs uppercase ${prioColor(t.priority)}">${t.priority}</span></div>
+        <span class="font-label-md text-[10px] text-on-surface-variant bg-surface-container px-1.5 py-0.5 rounded">${fmtStatus(t.status)}</span>
+      </div>
+      <h3 class="font-body-md font-bold text-primary">${t.title}</h3>
+      <p class="font-body-sm text-on-surface-variant mt-1 truncate">${t.full_name} — ${t.emp_code}</p>
+    </div>`).join('');
+}
+
+// ── EMPLOYEES ─────────────────────────────────────────────
+async function loadEmployees(){
+  const r=await fetch(`${API}/admin/employees`,{headers:H()});
+  const emps=await r.json(); allEmps=emps;
+  document.getElementById('empCount').textContent=`Showing ${emps.length} employee${emps.length!==1?'s':''}`;
+  populateEmpDropdown(emps); // keep task dropdown in sync
+  const b=document.getElementById('empBody');
+  if(!emps.length){b.innerHTML='<tr><td colspan="7" class="text-center py-xl text-on-surface-variant font-body-sm">No employees yet. Add your first one.</td></tr>';return;}
+  b.innerHTML=emps.map(e=>{
+    const pct=e.monthly_leaves>0?Math.round(e.leaves_remaining/e.monthly_leaves*100):0;
+    const barColor=pct>60?'bg-green-500':pct>30?'bg-secondary-fixed-dim':'bg-error';
+    return `<tr class="h-[48px] hover:bg-surface-container-low transition-colors">
+      <td class="px-md"><div class="flex items-center gap-md"><div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-on-primary font-bold text-xs shrink-0">${e.full_name.split(' ').map(n=>n[0]).join('').slice(0,2)}</div><div><span class="font-label-md text-primary block">${e.full_name}</span><span class="text-body-sm text-on-surface-variant">${e.email}</span></div></div></td>
+      <td class="px-md"><span class="font-code-sm text-code-sm bg-surface-container-high px-sm py-1 rounded border border-outline-variant" style="font-family:'JetBrains Mono',monospace;font-size:12px">${e.employee_id}</span></td>
+      <td class="px-md text-body-sm text-on-surface-variant">${e.department}</td>
+      <td class="px-md text-body-sm text-on-surface-variant">${e.designation}</td>
+      <td class="px-md"><div class="flex flex-col gap-xs w-32"><div class="flex justify-between items-center text-[11px] font-bold"><span class="text-on-surface-variant">${e.leaves_remaining}/${e.monthly_leaves}</span><span class="text-primary">${pct}%</span></div><div class="w-full bg-surface-container-high h-1 rounded-full overflow-hidden"><div class="${barColor} h-full" style="width:${pct}%"></div></div></div></td>
+      <td class="px-md"><span class="inline-flex items-center px-2 py-0.5 rounded-full text-[12px] font-bold ${e.is_active?'bg-green-100 text-green-800 border border-green-200':'bg-surface-variant text-on-surface-variant border border-outline-variant'}">${e.is_active?'Active':'Inactive'}</span></td>
+      <td class="px-md text-right whitespace-nowrap">
+        ${e.is_active?`<button onclick="quickAssignTask('${e.id}','${e.full_name.replace(/'/g,"\\'")} (${e.employee_id})')" class="px-sm py-1 border border-primary-container text-primary-container rounded text-xs font-label-md hover:bg-primary-container hover:text-white transition-colors mr-1">Assign Task</button>`:''}
+        <button onclick="toggleEmp('${e.id}',${e.is_active})" class="px-sm py-1 border border-outline-variant text-on-surface-variant rounded text-xs font-label-md hover:border-primary hover:text-primary transition-colors">${e.is_active?'Deactivate':'Activate'}</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ── LEAVES ────────────────────────────────────────────────
+async function loadLeaves(status){
+  const url=`${API}/admin/leaves`+(status?`?status=${status}`:'');
+  const r=await fetch(url,{headers:H()});
+  const leaves=await r.json();
+  const b=document.getElementById('leaveBody');
+  if(!leaves.length){b.innerHTML='<tr><td colspan="7" class="text-center py-xl text-on-surface-variant font-body-sm">No leave requests found</td></tr>';return;}
+  b.innerHTML=leaves.map(l=>`
+    <tr class="table-row-h hover:bg-surface-container-low transition-colors">
+      <td class="py-sm px-md"><div class="flex items-center gap-sm"><div class="w-7 h-7 rounded-full bg-primary-container flex items-center justify-center text-on-primary font-bold text-xs">${l.full_name[0]}</div><div><span class="font-body-sm font-medium text-primary block">${l.full_name}</span><span class="text-[11px] text-on-surface-variant">${l.department}</span></div></div></td>
+      <td class="font-body-sm text-on-surface-variant py-sm px-md whitespace-nowrap">${fmt(l.from_date)} — ${fmt(l.to_date)}</td>
+      <td class="py-sm px-md"><span class="font-code-sm text-code-sm bg-surface-container-high px-sm py-1 rounded border border-outline-variant text-xs">${l.total_days}d</span></td>
+      <td class="py-sm px-md text-body-sm text-on-surface-variant capitalize">${l.leave_type}</td>
+      <td class="py-sm px-md text-body-sm text-on-surface-variant max-w-[160px] truncate" title="${l.reason}">${l.reason}</td>
+      <td class="py-sm px-md"><span class="inline-block px-2 py-0.5 rounded-full font-label-md text-xs border ${statusBadge(l.status)}">${fmtStatus(l.status)}</span></td>
+      <td class="py-sm px-md text-right whitespace-nowrap">${l.status==='pending'?`<button onclick="approveLeave('${l.id}')" class="px-sm py-1 border border-divider text-ink-navy rounded font-label-md text-xs hover:bg-ink-navy hover:text-white mr-1">Approve</button><button onclick="rejectLeave('${l.id}')" class="px-sm py-1 border border-[#F0A8A8] text-[#991B1B] rounded font-label-md text-xs hover:bg-[#991B1B] hover:text-white">Reject</button>`:`<span class="text-body-sm text-on-surface-variant">${l.approved_by||'—'}</span>`}</td>
+    </tr>`).join('');
+}
+
+function filterLeaves(status,el){
+  document.querySelectorAll('#sec-leaves .flex.gap-xs button').forEach(b=>{b.className='px-md py-sm rounded font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-low';});
+  el.className='px-md py-sm rounded font-label-md text-label-md bg-primary-container text-white';
+  loadLeaves(status);
+}
+
+// ── TASKS ─────────────────────────────────────────────────
+async function loadTasks(){
+  const r=await fetch(`${API}/admin/tasks`,{headers:H()});
+  const tasks=await r.json();
+  const b=document.getElementById('taskBody');
+  if(!tasks.length){b.innerHTML='<tr><td colspan="6" class="text-center py-xl text-on-surface-variant font-body-sm">No tasks assigned yet</td></tr>';return;}
+  const now=new Date().toISOString().split('T')[0];
+  b.innerHTML=tasks.map(t=>{
+    const overdue=t.due_date&&t.due_date<now&&t.status!=='completed';
+    return `<tr class="table-row-h hover:bg-surface-container-low transition-colors">
+      <td class="py-sm px-md font-body-sm font-medium text-primary max-w-[200px] truncate">${t.title}</td>
+      <td class="py-sm px-md"><span class="font-body-sm text-on-surface-variant">${t.full_name}</span><br/><span class="font-code-sm text-[11px] bg-surface-container-high px-1 rounded border border-outline-variant" style="font-family:'JetBrains Mono',monospace">${t.emp_code}</span></td>
+      <td class="py-sm px-md"><div class="flex items-center gap-xs"><span class="w-2 h-2 rounded-full ${prioDot(t.priority)}"></span><span class="font-body-sm capitalize ${prioColor(t.priority)}">${t.priority}</span></div></td>
+      <td class="py-sm px-md font-body-sm ${overdue?'text-error font-bold':'text-on-surface-variant'}">${t.due_date?fmt(t.due_date):'—'}${overdue?' ⚠':''}</td>
+      <td class="py-sm px-md"><span class="inline-block px-2 py-0.5 rounded-full font-label-md text-xs border ${statusBadge(t.status)}">${fmtStatus(t.status)}</span></td>
+      <td class="py-sm px-md text-right whitespace-nowrap">
+        <button onclick="viewUpdates('${t.id}','${escQ(t.title)}')" class="px-sm py-1 border border-outline-variant text-on-surface-variant rounded text-xs font-label-md hover:border-primary hover:text-primary mr-1">Updates</button>
+        <button onclick="markComplete('${t.id}')" class="px-sm py-1 border border-green-200 text-green-800 rounded text-xs font-label-md hover:bg-green-100">Complete</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ── ATTENDANCE ────────────────────────────────────────────
+async function loadAttendance(){
+  const date=document.getElementById('attDate').value;
+  const r=await fetch(`${API}/admin/attendance?date=${date}`,{headers:H()});
+  const logs=await r.json();
+  document.getElementById('attCount').textContent=`${logs.length} employee${logs.length!==1?'s':''} present on this date`;
+  const b=document.getElementById('attBody');
+  if(!logs.length){b.innerHTML='<tr><td colspan="6" class="text-center py-xl text-on-surface-variant font-body-sm">No attendance records for this date</td></tr>';return;}
+  b.innerHTML=logs.map(l=>`
+    <tr class="table-row-h hover:bg-surface-container-low transition-colors">
+      <td class="py-sm px-md font-body-sm font-medium text-primary">${l.full_name}</td>
+      <td class="px-md"><span class="font-code-sm bg-surface-container-high px-sm py-1 rounded border border-outline-variant text-xs" style="font-family:'JetBrains Mono',monospace">${l.employee_id}</span></td>
+      <td class="py-sm px-md font-body-sm text-on-surface-variant">${l.department}</td>
+      <td class="py-sm px-md font-body-sm font-medium text-green-700">${fmtTime(l.login_time)}</td>
+      <td class="py-sm px-md font-body-sm ${l.logout_time?'text-on-surface':'text-secondary font-medium'}">${l.logout_time?fmtTime(l.logout_time):'Still active'}</td>
+      <td class="py-sm px-md font-body-sm font-bold text-primary">${l.total_hours?l.total_hours+'h':'—'}</td>
+    </tr>`).join('');
+}
+
+// ── ACTIONS ───────────────────────────────────────────────
+async function approveLeave(id){
+  if(!confirm('Approve this leave request?'))return;
+  const r=await fetch(`${API}/admin/leaves/${id}/approve`,{method:'PUT',headers:H()});
+  const d=await r.json();
+  if(r.ok){toast('Leave approved — employee notified','success');loadDashboard();if(!document.getElementById('sec-leaves').classList.contains('hidden'))loadLeaves('');}
+  else toast(d.error||'Failed','error');
+}
+async function rejectLeave(id){
+  if(!confirm('Reject this leave request?'))return;
+  const r=await fetch(`${API}/admin/leaves/${id}/reject`,{method:'PUT',headers:H()});
+  const d=await r.json();
+  if(r.ok){toast('Leave rejected — employee notified','success');loadDashboard();if(!document.getElementById('sec-leaves').classList.contains('hidden'))loadLeaves('');}
+  else toast(d.error||'Failed','error');
+}
+async function toggleEmp(id,active){
+  if(!confirm((active?'Deactivate':'Activate')+' this employee?'))return;
+  const r=await fetch(`${API}/admin/employees/${id}/toggle`,{method:'PUT',headers:H()});
+  if(r.ok){toast('Employee status updated','success');loadEmployees();}
+  else toast('Failed to update','error');
+}
+function quickAssignTask(empId, empLabel){
+  // Pre-select this employee in the task modal and open it
+  loadAllEmployeesForDropdown().then(()=>{
+    const sel=document.getElementById('t_emp');
+    sel.value=empId;
+    // Visual feedback if selection worked
+    if(!sel.value){
+      // Fallback: create option if not in list yet
+      const o=document.createElement('option');
+      o.value=empId; o.textContent=empLabel; o.selected=true;
+      sel.appendChild(o);
+    }
+    openModal('addTaskModal');
+    // Scroll to employee select to show it's pre-filled
+    setTimeout(()=>sel.scrollIntoView({behavior:'smooth',block:'center'}),200);
+  });
+}
+
+async function createEmployee(){
+  const name=document.getElementById('f_name').value.trim();
+  const email=document.getElementById('f_email').value.trim();
+  const dept=document.getElementById('f_dept').value;
+  const desg=document.getElementById('f_desg').value.trim();
+  const phone=document.getElementById('f_phone').value.trim();
+  const join=document.getElementById('f_join').value;
+  const leaves=document.getElementById('f_leaves').value;
+  if(!name||!email||!dept||!desg||!join){toast('Please fill all required fields','error');return;}
+  const r=await fetch(`${API}/admin/employees`,{method:'POST',headers:H(),body:JSON.stringify({full_name:name,email,department:dept,designation:desg,phone,join_date:join,monthly_leaves:leaves})});
+  const d=await r.json();
+  if(!r.ok){toast(d.error||'Failed to create','error');return;}
+  document.getElementById('newEmpId').textContent=d.employee_id;
+  document.getElementById('newEmpPass').textContent=d.password;
+  document.getElementById('newEmpName').textContent=d.full_name;
+  document.getElementById('newEmpEmailStatus').textContent=d.email_sent?'✓ Sent to '+d.email:'Not configured (set SMTP in .env)';
+  document.getElementById('addEmpForm').classList.add('hidden');
+  document.getElementById('addEmpSuccess').classList.remove('hidden');
+  toast('Employee created!','success');
+}
+function doneAddEmp(){
+  closeModal('addEmpModal');
+  document.getElementById('addEmpForm').classList.remove('hidden');
+  document.getElementById('addEmpSuccess').classList.add('hidden');
+  ['f_name','f_email','f_desg','f_phone'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f_dept').value='';document.getElementById('f_leaves').value='10';
+  loadEmployees();
+}
+function populateEmpDropdown(emps){
+  const sel=document.getElementById('t_emp');
+  const prev=sel.value; // remember previously selected
+  sel.innerHTML='<option value="">Select employee to assign task…</option>';
+  const active=emps.filter(e=>e.is_active);
+  if(!active.length){
+    sel.innerHTML='<option value="">No active employees — add one first</option>';
+    return;
+  }
+  active.forEach(e=>{
+    const o=document.createElement('option');
+    o.value=e.id;
+    o.textContent=`${e.full_name} (${e.employee_id}) — ${e.department}`;
+    sel.appendChild(o);
+  });
+  if(prev) sel.value=prev; // restore selection if still valid
+}
+
+async function loadAllEmployeesForDropdown(){
+  try{
+    const r=await fetch(`${API}/admin/employees`,{headers:H()});
+    if(!r.ok) return;
+    const emps=await r.json();
+    allEmps=emps;
+    populateEmpDropdown(emps);
+  }catch(e){console.error('Could not load employees for dropdown',e);}
+}
+async function createTask(){
+  const title=document.getElementById('t_title').value.trim();
+  const desc=document.getElementById('t_desc').value.trim();
+  const emp=document.getElementById('t_emp').value;
+  const priority=document.getElementById('t_priority').value;
+  const due=document.getElementById('t_due').value;
+  if(!title||!emp){toast('Title and employee are required','error');return;}
+  const r=await fetch(`${API}/admin/tasks`,{method:'POST',headers:H(),body:JSON.stringify({title,description:desc,assigned_to:emp,priority,due_date:due})});
+  const d=await r.json();
+  if(r.ok){toast('Task assigned — employee notified','success');closeModal('addTaskModal');document.getElementById('t_title').value='';document.getElementById('t_desc').value='';document.getElementById('t_emp').value='';document.getElementById('t_due').value='';loadTasks();}
+  else toast(d.error||'Failed','error');
+}
+async function markComplete(id){
+  if(!confirm('Mark this task as completed?'))return;
+  const r=await fetch(`${API}/admin/tasks/${id}`,{method:'PUT',headers:H(),body:JSON.stringify({status:'completed'})});
+  if(r.ok){toast('Task marked complete','success');loadTasks();}
+  else toast('Failed','error');
+}
+async function viewUpdates(id,title){
+  document.getElementById('tuModalTitle').textContent=title;
+  document.getElementById('tuModalBody').innerHTML='<p class="text-center text-on-surface-variant font-body-sm py-lg">Loading…</p>';
+  openModal('taskUpdatesModal');
+  const r=await fetch(`${API}/admin/tasks/${id}/updates`,{headers:H()});
+  const updates=await r.json();
+  const b=document.getElementById('tuModalBody');
+  if(!updates.length){b.innerHTML='<p class="text-center text-on-surface-variant font-body-sm py-lg">No updates from the employee yet.</p>';return;}
+  b.innerHTML=updates.map(u=>`<div class="flex gap-md mb-md pb-md border-b border-divider last:border-0"><div class="w-2 h-2 rounded-full bg-outline mt-sm shrink-0"></div><div><p class="font-body-sm text-primary">${u.update_text}${u.status_changed_to?` <span class="inline-block px-2 py-0.5 rounded-full text-[11px] border ${statusBadge(u.status_changed_to)} ml-sm">${fmtStatus(u.status_changed_to)}</span>`:''}</p><span class="text-[11px] text-on-surface-variant">${u.full_name} · ${fmtTime(u.created_at)}</span></div></div>`).join('');
+}
+function copyIt(id){navigator.clipboard.writeText(document.getElementById(id).textContent).then(()=>toast('Copied!','success'));}
+
+// ── UTILS ─────────────────────────────────────────────────
+function fmt(d){if(!d)return'—';return new Date(d+'T00:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});}
+function fmtTime(dt){if(!dt)return'—';return new Date(dt).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true});}
+function fmtStatus(s){return{pending:'Pending',approved:'Approved',rejected:'Rejected',in_progress:'In Progress',on_hold:'On Hold',completed:'Completed'}[s]||s;}
+function statusBadge(s){return{pending:'bg-[#FDF6E3] text-[#92650A] border-[#F0D080]',approved:'bg-[#EAF6F0] text-[#1A6640] border-[#A8DFC0]',rejected:'bg-[#FBEAEA] text-[#8B1A1A] border-[#F0A8A8]',in_progress:'bg-[#EAF0FB] text-[#1A3A80] border-[#A8C0F0]',on_hold:'bg-[#F4F0FB] text-[#4A2A80] border-[#C8A8F0]',completed:'bg-[#EAF6F0] text-[#1A6640] border-[#A8DFC0]'}[s]||'bg-surface-container text-on-surface-variant border-outline-variant';}
+function prioDot(p){return{urgent:'bg-error',high:'bg-[#D69E2E]',medium:'bg-[#6B7A99]',low:'bg-green-600'}[p]||'bg-outline';}
+function prioColor(p){return{urgent:'text-error',high:'text-[#8B4A0A]',medium:'text-[#1A3A6A]',low:'text-green-700'}[p]||'text-on-surface-variant';}
+function escQ(s){return s.replace(/'/g,"\\'")}
+function toast(msg,type=''){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show '+(type==='success'?'success':type==='error'?'error':'');setTimeout(()=>t.classList.remove('show'),3200);}
+</script>
+</body></html>

@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    { "source": "/admin", "destination": "/admin/index.html" },
+    { "source": "/admin/", "destination": "/admin/index.html" },
+    { "source": "/admin/dashboard", "destination": "/admin/dashboard.html" },
+    { "source": "/admin/dashboard.html", "destination": "/admin/dashboard.html" },
+    { "source": "/employee", "destination": "/employee/index.html" },
+    { "source": "/employee/", "destination": "/employee/index.html" },
+    { "source": "/employee/dashboard", "destination": "/employee/dashboard.html" },
+    { "source": "/employee/dashboard.html", "destination": "/employee/dashboard.html" }
+  ]
+}
